@@ -9,7 +9,7 @@ var fs = require("fs");
 //   var getFilePath would be a private variable if not assigned to exports.  Otherwise
 //   exports.getFilePath would be the same as local.  Other functions that needed to call
 //   getFilePath would have to use `getFilePath` even if in the same file.  To define both
-//   an export and a local variable, we uset he x = y = function() syntax where one is
+//   an export and a local variable, we use the x = y = function() syntax where one is
 //   the export and the other is the local private (to eliminate the "export." part when
 //   calling local).
 //

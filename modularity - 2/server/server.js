@@ -26,7 +26,9 @@ var url = require("url");
 //
 
 // NOTE: for demonstration purposes, some of the file handlers are asynchronous and others
-//  synchronous.  There's no other technical reason why they are one way or the other.
+//  synchronous.  There's no other technical reason why they are one way or the other. In
+//  general, they should always be asynchronous unless there's a very compelling reason to
+//  do otherwise.
 //
 
 // NOTE: The below code is an example of how one might handle incoming requests without
@@ -70,15 +72,18 @@ var server = http.createServer(function (request, response) {
     }
   }
 });
+
+// NOTE: content was converted to a string, but that won't work if
+//  loading an image or binary/non-text file.
 */
 
 var server = http.createServer(function(request, response) {
   if (request.method === "GET") {
     var addy = (request.url === "/" ? "/index.html" : request.url);
 
-    // NOTE: this could be a if {...} else {...} also.  Using switch here is cleaner and
+    // NOTE: this could be an if {...} else {...} also.  Using switch here is cleaner and
     //  shows an alternate way to accomplish it.  In production you would not want to use
-    //  a switch statement for serving up all possible files.
+    //  a switch statement for serving up all possible files, as you'll learn in module-3.
     //
     switch (addy) {
       case "/index.html":
@@ -107,12 +112,15 @@ var server = http.createServer(function(request, response) {
     }
   }
   else {
-    response.end("", "", 405);
+    response.writeHead(405);
+    response.end("Method not allowed.", "");
   }
 });
 
-server.listen(3000);
-console.log("Server running at http://127.0.0.1:3000/");
+var port = process.env.PORT || 3000;
+server.listen(port);
+
+console.log("Server running at http://127.0.0.1:" + port + "/");
 
 
 

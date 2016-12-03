@@ -1,8 +1,5 @@
 
 var http = require("http");
-var fs = require("fs");
-var path = require("path");
-var url = require("url");
 
 var helpers = require("./request-helpers.js");
 
@@ -73,11 +70,11 @@ var server = http.createServer(function (request, response) {
       //  be valid.  But in case of this example, the 'this' context is not being used
       //  anywhere so it doesn't matter what is passed in.  I chose null to reflect that.
       //
-      route[0].call(null, request, response, addy, route[1], 200);
+      route[0](request, response, addy, route[1], 200);
 
       // or try this instead:
       //
-      //route[0](request, response, addy, route[1], 200);
+      //route[0].call(this, request, response, addy, route[1], 200);
 
       // Both work.  I think I did the route[0].call(...) syntax to make it clearer
       //  that it is calling a function.
@@ -91,10 +88,20 @@ var server = http.createServer(function (request, response) {
 
     }
   }
+
+  // HTTP method not supported in this app.
+  //
+  else {
+    response.writeHead(405);
+    response.end("Method not allowed.", "");
+  }
 });
 
-server.listen(3000);
-console.log("Server running at http://127.0.0.1:3000/");
+
+var port = process.env.PORT || 3000;
+server.listen(port);
+
+console.log("Server running at http://127.0.0.1:" + port + "/");
 
 
 // NOTE: notice that the helper functions are not here anymore.  Here we decided to move the helper

@@ -10,6 +10,27 @@ var url = require("url");
 //
 // ...
 //
+
+// Incoming Request
+//   if GET
+//     If (valid url)
+//       do something
+//       send response (200, 301, 404, 500, etc.)
+//
+//     Else If (other valid url)
+//       do something
+//       send response
+//
+//     else
+//       respond with 404 not found
+//
+//   Else if POST
+//     ...
+//
+//   Else
+//     respond 405
+//
+
 // Incoming Request
 //   If (valid url)
 //     convert url to file system address
@@ -133,7 +154,8 @@ var server = http.createServer(function (request, response) {
     }
 
     else {
-      response.end("", "", 404);
+      response.writeHead(404);
+      response.end("Not found.", "");
     }
   }
 
@@ -151,9 +173,12 @@ var server = http.createServer(function (request, response) {
   }
 
   else {
-    response.end("", "", 405);
+    response.writeHead(405);
+    response.end("Method not allowed.", "");
   }
 });
 
-server.listen(3000);
-console.log("Server running at http://127.0.0.1:3000/");
+var port = process.env.PORT || 3000;
+server.listen(port);
+
+console.log("Server running at http://127.0.0.1:" + port + "/");
