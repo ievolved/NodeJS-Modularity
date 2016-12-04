@@ -1,9 +1,10 @@
 
-var http = require("http");
-var fs = require("fs");
-var path = require("path");
-var url = require("url");
+let http = require("http");
+let fs = require("fs");
+let path = require("path");
+let url = require("url");
 
+"use strict";
 
 
 // Think to yourself, what are the steps we want to modularize?
@@ -55,21 +56,25 @@ var url = require("url");
 //  modularization.  Modularization is when we break the code into re-usable functions
 //  and/or node modules (files).
 //
-var server = module.exports = http.createServer(function (request, response) {
-  console.log("request at: " + request.method + " url: " + request.url);
+
+// NOTE: module.exports is only there so the unit tests can successfully run.  There is
+//  no other technical reason to include it.
+//
+let server = module.exports = http.createServer((request, response) => {
+  console.log(`${request.method} ${request.url}`);
 
   if (request.method === "GET") {
     if (request.url === "/" || request.url === "/index.html") {
-      var addy = (request.url === "/") ? "/index.html" : request.url;
-      var filename = path.join(__dirname, "../web/" + addy);
+      let pathname = (request.url === "/") ? "/index.html" : url.parse(request.url).pathname;
+      let filename = path.join(__dirname, "../web/" + pathname);
 
-      fs.readFile(filename, "utf8", function(err, data) {
+      fs.readFile(filename, (err, data) => {
         if (err) {
           response.writeHead(500);
           response.end(JSON.stringify(err));
         }
         else {
-          var content = data.toString();
+          let content = data.toString();
 
           response.writeHead(200, {"Content-Type": "text/html"});
           response.write(content, "utf-8");
@@ -79,16 +84,16 @@ var server = module.exports = http.createServer(function (request, response) {
     }
 
     else if (request.url === "/about.html") {
-      var addy = request.url;
-      var filename = path.join(__dirname, "../web/" + addy);
+      let pathname = url.parse(request.url).pathname;
+      let filename = path.join(__dirname, "../web/" + pathname);
 
-      fs.readFile(filename, "utf8", function(err, data) {
+      fs.readFile(filename, (err, data) => {
         if (err) {
           response.writeHead(500);
           response.end(JSON.stringify(err));
         }
         else {
-          var content = data.toString();
+          let content = data.toString();
 
           response.writeHead(200, {"Content-Type": "text/html"});
           response.write(content, "utf-8");
@@ -98,15 +103,16 @@ var server = module.exports = http.createServer(function (request, response) {
     }
 
     else if (request.url === "/contact.html") {
-      var addy = request.url;
-      var filename = path.join(__dirname, "../web/" + addy);
-      fs.readFile(filename, "utf8", function(err, data) {
+      let pathname = url.parse(request.url).pathname;
+      let filename = path.join(__dirname, "../web/" + pathname);
+
+      fs.readFile(filename, (err, data) => {
         if (err) {
           response.writeHead(404);
           response.end(JSON.stringify(err));
         }
         else {
-          var content = data.toString();
+          let content = data.toString();
 
           response.writeHead(200, {"Content-Type": "text/html"});
           response.write(content, "utf-8");
@@ -116,16 +122,16 @@ var server = module.exports = http.createServer(function (request, response) {
     }
 
     else if (request.url === "/style.css") {
-      var addy = request.url;
-      var filename = path.join(__dirname, "../web/" + addy);
+      let pathname = url.parse(request.url).pathname;
+      let filename = path.join(__dirname, "../web/" + pathname);
 
-      fs.readFile(filename, "utf8", function(err,data) {
+      fs.readFile(filename, (err,data) => {
         if (err) {
           response.writeHead(404);
           response.end(JSON.stringify(err));
         }
         else {
-          var content = data.toString();
+          let content = data.toString();
 
           response.writeHead(200, { "Content-Type": "text/css" });
           response.write(content, "utf8");
@@ -135,16 +141,16 @@ var server = module.exports = http.createServer(function (request, response) {
     }
 
     else if (request.url === "/scripts.js") {
-      var addy = request.url;
-      var filename = path.join(__dirname, "../web/" + addy);
+      let pathname = url.parse(request.url).pathname;
+      let filename = path.join(__dirname, "../web/" + pathname);
 
-      fs.readFile(filename, "utf8", function(err,data) {
+      fs.readFile(filename, (err,data) => {
         if (err) {
           response.writeHead(404);
           response.end(JSON.stringify(err));
         }
         else {
-          var content = data.toString();
+          let content = data.toString();
 
           response.writeHead(200, { "Content-Type": "application/javascript" });
           response.write(content, "utf8");
@@ -160,15 +166,17 @@ var server = module.exports = http.createServer(function (request, response) {
   }
 
   else if (request.method === "POST") {
-    console.log("POST received");
-    var data = "";
+    let data = "";
 
     request.on("data", function(chunk) {
       data += chunk;
     });
 
     request.on("end", function() {
-      response.end("received " + data + ", right back at yas1", 200);
+      let contentType = (request.contentType || "text/plain");
+
+      response.setHeader("content-Type", contentType);
+      response.end(data, 200);
     })
   }
 
@@ -178,7 +186,7 @@ var server = module.exports = http.createServer(function (request, response) {
   }
 });
 
-var port = process.env.PORT || 3000;
+let port = process.env.PORT || 3000;
 server.listen(port);
 
-console.log("Server running at http://127.0.0.1:" + port + "/");
+console.log(`Server running at http://127.0.0.1:${port}/`);

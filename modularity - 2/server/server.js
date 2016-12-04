@@ -1,8 +1,8 @@
 
-var http = require("http");
-var fs = require("fs");
-var path = require("path");
-var url = require("url");
+let http = require("http");
+let fs = require("fs");
+let path = require("path");
+let url = require("url");
 
 
 // This to yourself, what are the steps we want to modularize?
@@ -77,35 +77,39 @@ var server = http.createServer(function (request, response) {
 //  loading an image or binary/non-text file.
 */
 
-var server = exports.server = http.createServer(function(request, response) {
-  console.log("request at: " + request.method + " url: " + request.url);
+// NOTE: module.exports is only there so the unit tests can successfully run.  There is
+//  no other technical reason to include it.
+//
+
+let server = exports.server = http.createServer((request, response) => {
+  console.log(`${request.method} ${request.url}`);
 
   if (request.method === "GET") {
-    var addy = (request.url === "/" ? "/index.html" : request.url);
+    let pathname = (request.url === "/" ? "/index.html" : url.parse(request.url).pathname);
 
     // NOTE: this could be an if {...} else {...} also.  Using switch here is cleaner and
     //  shows an alternate way to accomplish it.  In production you would not want to use
     //  a switch statement for serving up all possible files, as you'll learn in module-3.
     //
-    switch (addy) {
+    switch (pathname) {
       case "/index.html":
-        sendFileResponse(request, response, addy, "text/html", 200);
+        sendFileResponse(request, response, pathname, "text/html", 200);
         break;
 
       case "/about.html":
-        sendFileResponse(request, response, addy, "text/html", 200);
+        sendFileResponse(request, response, pathname, "text/html", 200);
         break;
 
       case "/contact.html":
-        sendFileResponse(request, response, addy, "text/html", 200);
+        sendFileResponse(request, response, pathname, "text/html", 200);
         break;
 
       case "/style.css":
-        sendFileResponse(request, response, addy, "text/css", 200);
+        sendFileResponse(request, response, pathname, "text/css", 200);
         break;
 
       case "/scripts.js":
-        sendFileResponse(request, response, addy, "application/javascript", 200);
+        sendFileResponse(request, response, pathname, "application/javascript", 200);
         break;
 
       default:
@@ -113,24 +117,40 @@ var server = exports.server = http.createServer(function(request, response) {
         break;
     }
   }
+
+  else if (request.method === "POST") {
+    let data = "";
+
+    request.on("data", function(chunk) {
+      data += chunk;
+    });
+
+    request.on("end", function() {
+      let contentType = (request.contentType || "text/plain");
+
+      response.setHeader("content-Type", contentType);
+      response.end(data, 200);
+    })
+  }
+
   else {
     response.writeHead(405);
     response.end("Method not allowed.", "");
   }
 });
 
-var port = process.env.PORT || 3000;
+let port = process.env.PORT || 3000;
 server.listen(port);
 
-console.log("Server running at http://127.0.0.1:" + port + "/");
+console.log(`Server running at http://127.0.0.1:${port}/`);
 
 
 
 // From (1) above
 //
 function getFilePath(page) {
-  var uri = url.parse(page).pathname;
-  var filepath = path.join(__dirname, "../web/" + uri);
+  let pathname = url.parse(page).pathname;
+  let filepath = path.join(__dirname, "../web/" + pathname);
 
   return filepath;
 }
@@ -138,7 +158,7 @@ function getFilePath(page) {
 // From (3) above
 //
 function loadFile(filepath) {
-  var content = fs.readFileSync(filepath, "utf8");
+  let content = fs.readFileSync(filepath, "utf8");
   return content;
 }
 
@@ -149,8 +169,8 @@ function loadFile(filepath) {
 //   each case.
 //
 function sendFileResponse(request, response, page, contentType, status) {
-  var path = getFilePath(page);
-  var content = loadFile(path);
+  let path = getFilePath(page);
+  let content = loadFile(path);
 
   sendResponse(request, response, content, contentType, status);
 }
@@ -163,4 +183,4 @@ function sendResponse(request, response, content, contentType, status) {
   response.writeHead(status, { "Content-Type": contentType });
   response.write(content, "utf8");
   response.end();
-};
+}

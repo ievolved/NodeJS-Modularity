@@ -1,7 +1,8 @@
 
-var http = require("http");
+let http = require("http");
+let url = require("url");
 
-var helpers = require("./request-helpers.js");
+let helpers = require("./request-helpers.js");
 
 // incoming request
 //
@@ -36,7 +37,7 @@ var helpers = require("./request-helpers.js");
 //  is an array holding the function that will be called, and the content-type that must be used
 //  with the file type.
 //
-var routes = {
+let routes = {
   "/index.html": [ helpers.sendFileResponse, "text/html" ],
   "/about.html": [ helpers.sendFileResponse, "text/html"],
   "/contact.html": [ helpers.sendFileResponse, "text/html" ],
@@ -44,9 +45,11 @@ var routes = {
   "/scripts.js": [ helpers.sendFileResponse, "application/javascript" ]
 };
 
-
-var server = exports.server = http.createServer(function (request, response) {
-  console.log("request at: " + request.method + " url: " + request.url);
+// NOTE: module.exports is only there so the unit tests can successfully run.  There is
+//  no other technical reason to include it.
+//
+let server = exports.server = http.createServer((request, response) => {
+  console.log(`${request.method} ${request.url}`);
 
   // incoming request
   // if GET
@@ -57,28 +60,28 @@ var server = exports.server = http.createServer(function (request, response) {
   //   then handle it another way / or not
   //
   if (request.method === "GET") {
-    var addy = (request.url === "/" ? "/index.html" : request.url);
+    let pathname = (request.url === "/" ? "/index.html" : url.parse(request.url).pathname);
 
-    // Use 'addy' as a key to lookup the function handler in routes.
+    // Use 'pathname' as a key to lookup the function handler in routes.
     //
-    var route = routes[addy];
+    let route = routes[pathname];
     if (route) {
       //
       // If the key exists, then use array index [0] -- which is the function handler
       //  for this route -- to execute the response.  Again, you'll notice that route[1]
       //  is the second element in the routes value array to indicate the content-type.
       //
+      route[0](request, response, pathname, route[1], 200);
+
+      // or try this instead:
+      //
       // There is no technical reason why I used 'null' instead of 'this'.  Both would
       //  be valid.  But in case of this example, the 'this' context is not being used
       //  anywhere so it doesn't matter what is passed in.  I chose null to reflect that.
       //
-      route[0](request, response, addy, route[1], 200);
+      //route[0].call(null, request, response, pathname, route[1], 200);
 
-      // or try this instead:
-      //
-      //route[0].call(this, request, response, addy, route[1], 200);
-
-      // Both work.  I think I did the route[0].call(...) syntax to make it clearer
+      // Both work.  I think I prefer the route[0].call(...) syntax to make it clearer
       //  that it is calling a function.
       //
     }
@@ -91,6 +94,21 @@ var server = exports.server = http.createServer(function (request, response) {
     }
   }
 
+  else if (request.method === "POST") {
+    let data = "";
+
+    request.on("data", function(chunk) {
+      data += chunk;
+    });
+
+    request.on("end", function() {
+      let contentType = (request.contentType || "text/plain");
+
+      response.setHeader("content-Type", contentType);
+      response.end(data, 200);
+    })
+  }
+
   // HTTP method not supported in this app.
   //
   else {
@@ -100,10 +118,10 @@ var server = exports.server = http.createServer(function (request, response) {
 });
 
 
-var port = process.env.PORT || 3000;
+let port = process.env.PORT || 3000;
 server.listen(port);
 
-console.log("Server running at http://127.0.0.1:" + port + "/");
+console.log(`Server running at http://127.0.0.1:${port}/`);
 
 
 // NOTE: notice that the helper functions are not here anymore.  Here we decided to move the helper

@@ -15,12 +15,12 @@ chai.use(chaiHttp);
 
 "use strict";
 
-let host = "http://127.0.0.1:3000/";
+let host = "http://127.0.0.1:3000";
 
 describe("pages.", () => {
   it("homepage should load successfully.", (done) => {
     request
-      .get(host, (err, response, body) => {
+      .get(`${host}/`, (err, response, body) => {
         expect(response.statusCode).to.equal(200);
         expect(response).to.have.header("content-Type", "text/html");
         expect(body).include("Hello from NodeJS");
@@ -30,7 +30,7 @@ describe("pages.", () => {
 
   it("/index.html should load successfully.", (done) => {
     request
-      .get(host + "index.html", (err, response, body) => {
+      .get(`${host}/index.html`, (err, response, body) => {
         expect(response.statusCode).to.equal(200);
         expect(response).to.have.header("content-Type", "text/html");
         expect(body).include("Hello from NodeJS");
@@ -40,7 +40,7 @@ describe("pages.", () => {
 
   it("/about.html should load successfully.", (done) => {
     request
-      .get(host + "about.html", (err, response, body) => {
+      .get(`${host}/about.html`, (err, response, body) => {
         expect(response.statusCode).to.equal(200);
         expect(response).to.have.header("content-Type", "text/html");
         expect(body).include("About NodeJS");
@@ -50,7 +50,7 @@ describe("pages.", () => {
 
   it("/contact.html should load successfully.", (done) => {
     request
-      .get(host + "contact.html", (err, response, body) => {
+      .get(`${host}/contact.html`, (err, response, body) => {
         expect(response.statusCode).to.equal(200);
         expect(response).to.have.header("content-Type", "text/html");
         expect(body).include("Hello from NodeJS");
@@ -60,7 +60,7 @@ describe("pages.", () => {
 
   it("/scripts.js should load successfully.", (done) => {
     request
-      .get(host + "scripts.js", (err, response, body) => {
+      .get(`${host}/scripts.js`, (err, response, body) => {
         expect(response.statusCode).to.equal(200);
         expect(response).to.have.header("content-Type", "application/javascript");
         expect(body).include("local JS file works");
@@ -70,7 +70,7 @@ describe("pages.", () => {
 
   it("/style.css should load successfully.", (done) => {
     request
-      .get(host + "style.css", (err, response, body) => {
+      .get(`${host}/style.css`, (err, response, body) => {
         expect(response.statusCode).to.equal(200);
         expect(response).to.have.header("content-Type", "text/css");
         expect(body).include("#main");
@@ -80,15 +80,32 @@ describe("pages.", () => {
 
   it("/invalid.html should return 404.", (done) => {
     request
-      .get(host + "invalid.html", (err, response, body) => {
+      .get(`${host}/invalid.html`, (err, response, body) => {
         expect(response.statusCode).to.equal(404);
         done();
       });
   });
 
-  it("any non-GET method should return 405.", (done) => {
+  it("any POST should echo back.", (done) => {
+    let message = "ehlo";
+
     request
-      .put(host + "index.html", (err, response, body) => {
+      .post(
+        { url: `${host}/index.html`,
+          body: message,
+          headers: { "content-Type": "text/plain" }
+        },
+        (err, response, body) => {
+          expect(response.statusCode).to.equal(200);
+          expect(body).to.equal(message);
+          done();
+        }
+      );
+  });
+
+  it("unsupported method should return 405.", (done) => {
+    request
+      .put(`${host}/index.html`, (err, response, body) => {
         expect(response.statusCode).to.equal(405);
         done();
       });
