@@ -55,7 +55,7 @@ var url = require("url");
 //  modularization.  Modularization is when we break the code into re-usable functions
 //  and/or node modules (files).
 //
-var server = http.createServer(function (request, response) {
+var server = module.exports = http.createServer(function (request, response) {
   console.log("request at: " + request.method + " url: " + request.url);
 
   if (request.method === "GET") {

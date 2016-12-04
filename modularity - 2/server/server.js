@@ -77,7 +77,9 @@ var server = http.createServer(function (request, response) {
 //  loading an image or binary/non-text file.
 */
 
-var server = http.createServer(function(request, response) {
+var server = exports.server = http.createServer(function(request, response) {
+  console.log("request at: " + request.method + " url: " + request.url);
+
   if (request.method === "GET") {
     var addy = (request.url === "/" ? "/index.html" : request.url);
 

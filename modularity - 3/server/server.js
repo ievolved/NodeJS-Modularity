@@ -41,11 +41,13 @@ var routes = {
   "/about.html": [ helpers.sendFileResponse, "text/html"],
   "/contact.html": [ helpers.sendFileResponse, "text/html" ],
   "/style.css": [ helpers.sendFileResponse, "text/css" ],
-  "/scripts.js": [ helpers.sendFileResponse, "application/javscript" ]
+  "/scripts.js": [ helpers.sendFileResponse, "application/javascript" ]
 };
 
 
-var server = http.createServer(function (request, response) {
+var server = exports.server = http.createServer(function (request, response) {
+  console.log("request at: " + request.method + " url: " + request.url);
+
   // incoming request
   // if GET
   //   then handle GET
