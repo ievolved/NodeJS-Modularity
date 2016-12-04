@@ -1,7 +1,7 @@
 
-var path = require("path");
-var url = require("url");
-var fs = require("fs");
+let path = require("path");
+let url = require("url");
+let fs = require("fs");
 
 
 // What is the pattern: exports.getFilePath = getFilepath = function(...) {...} ??
@@ -15,20 +15,20 @@ var fs = require("fs");
 //
 
 exports.getFilePath = getFilePath = function(page) {
-  var uri = url.parse(page).pathname;
-  var filepath = path.join(__dirname, "../web/" + uri);
+  var pathname = url.parse(page).pathname;
+  var filepath = path.join(__dirname, "../web/" + pathname);
 
   return filepath;
 };
 
 exports.loadFile = loadFile = function(filepath) {
-  var content = fs.readFileSync(filepath, "utf8");
+  let content = fs.readFileSync(filepath);
   return content;
 };
 
 exports.sendFileResponse = sendFileResponse = function (request, response, page, contentType, status) {
-  var path = getFilePath(page);
-  var content = loadFile(path);
+  let path = getFilePath(page);
+  let content = loadFile(path);
 
   sendResponse(request, response, content, contentType, status);
 };
