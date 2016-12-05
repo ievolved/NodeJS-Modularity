@@ -168,11 +168,11 @@ let server = module.exports = http.createServer((request, response) => {
   else if (request.method === "POST") {
     let data = "";
 
-    request.on("data", function(chunk) {
+    request.on("data", (chunk) =>  {
       data += chunk;
     });
 
-    request.on("end", function() {
+    request.on("end", () => {
       let contentType = (request.contentType || "text/plain");
 
       response.setHeader("content-Type", contentType);
