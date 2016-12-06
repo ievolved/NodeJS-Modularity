@@ -14,26 +14,26 @@ let fs = require("fs");
 //   calling local).
 //
 
-exports.getFilePath = getFilePath = function(page) {
+exports.getFilePath = getFilePath = (page) => {
   var pathname = url.parse(page).pathname;
   var filepath = path.join(__dirname, "../web/" + pathname);
 
   return filepath;
 };
 
-exports.loadFile = loadFile = function(filepath) {
+exports.loadFile = loadFile = (filepath) => {
   let content = fs.readFileSync(filepath);
   return content;
 };
 
-exports.sendFileResponse = sendFileResponse = function (request, response, page, contentType, status) {
+exports.sendFileResponse = sendFileResponse = (request, response, page, contentType, status) => {
   let path = getFilePath(page);
   let content = loadFile(path);
 
   sendResponse(request, response, content, contentType, status);
 };
 
-exports.sendResponse = sendResponse = function (request, response, content, contentType, status) {
+exports.sendResponse = sendResponse = (request, response, content, contentType, status) => {
   status = status || 200;
 
   response.writeHead(status, { "Content-Type": contentType });

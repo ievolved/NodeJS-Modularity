@@ -25,7 +25,7 @@ let helpers = require("./request-helpers.js");
 //  <sendResponse might be in common>
 //
 //
-// Each of these steps appear to be resuable for many requests.  That is what
+// Each of these steps appear to be reusable for many requests.  That is what
 //  we'll attempt to refactor.
 //
 
