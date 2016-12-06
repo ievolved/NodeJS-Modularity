@@ -1,7 +1,7 @@
 {
   "name": "modularity-4",
   "version": "1.0.0",
-  "description": "",
+  "description": "The 4th iteration of a typical vanilla Node app into a reusable/modularized one.  For demo purposes only.",
   "main": "server/server.js",
   "directories": {
     "test": "test"
@@ -10,8 +10,16 @@
     "test": "mocha --timeout 10000",
     "start": "nodemon ./server/server.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ievolved/nodejs-modularity.git"
+  },
   "author": "Shawn Bullock",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ievolved/nodejs-modularity/issues"
+  },
+  "homepage": "https://github.com/ievolved/nodejs-modularity#readme",
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
