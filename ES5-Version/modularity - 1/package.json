@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "The 1st iteration of a typical vanilla Node app into a reusable/modularized one.  For demo purposes only.",
   "main": "server/server.js",
+  "engineStrict": true,
+  "engines": {
+    "node": ">=4.0"
+  },
   "directories": {
     "test": "test"
   },
